@@ -58,6 +58,12 @@ use OCP\Authentication\TwoFactorAuth\TwoFactorProviderChallengeFailed;
 use OCP\Authentication\TwoFactorAuth\TwoFactorProviderChallengePassed;
 use OCP\Console\ConsoleEvent;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\Files\Events\Node\BeforeNodeReadEvent;
+use OCP\Files\Events\Node\NodeCopiedEvent;
+use OCP\Files\Events\Node\NodeCreatedEvent;
+use OCP\Files\Events\Node\NodeDeletedEvent;
+use OCP\Files\Events\Node\NodeRenamedEvent;
+use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\IConfig;
 use OCP\IGroupManager;
 use OCP\IUserSession;
@@ -198,6 +204,7 @@ class Application extends App implements IBootstrap {
 				$file = $event->getNode();
 				$fileActions->preview([
 					'path' => mb_substr($file->getInternalPath(), 5),
+					'id' => $file->getId(),
 					'width' => $event->getWidth(),
 					'height' => $event->getHeight(),
 					'crop' => $event->isCrop(),
@@ -206,47 +213,91 @@ class Application extends App implements IBootstrap {
 			}
 		);
 
+		/*
+		$eventDispatcher->addListener(
+			NodeRenamedEvent::class,
+			function (NodeRenamedEvent $event) use ($fileActions) {
+				$source = $event->getSource();
+				$target = $event->getTarget();
+				$fileActions->rename([
+					'oldpath' => mb_substr($source->getInternalPath(), 5),
+					'newpath' => mb_substr($target->getInternalPath(), 5),
+					'oldid' => $source->getId(),
+					'newid' => $target->getId()
+				]);
+			}
+		);
+		*/
+
 		Util::connectHook(
 			Filesystem::CLASSNAME,
 			Filesystem::signal_post_rename,
 			$fileActions,
 			'rename'
 		);
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_post_create,
-			$fileActions,
-			'create'
+
+		$eventDispatcher->addListener(
+			NodeCreatedEvent::class,
+			function (NodeCreatedEvent $event) use ($fileActions) {
+				$file = $event->getNode();
+				$fileActions->create([
+					'path' => mb_substr($file->getInternalPath(), 5),
+					'id' => $file->getId(),
+				]);
+			}
 		);
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_post_copy,
-			$fileActions,
-			'copy'
+
+		$eventDispatcher->addListener(
+			NodeCopiedEvent::class,
+			function (NodeCopiedEvent $event) use ($fileActions) {
+				$source = $event->getSource();
+				$fileActions->copy([
+					'oldpath' => mb_substr($source->getInternalPath(), 5),
+					'newpath' => mb_substr($event->getTarget()->getInternalPath(), 5),
+					'oldid' => $source->getId(),
+					'newid' => $event->getTarget()->getId()
+				]);
+			}
 		);
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_post_write,
-			$fileActions,
-			'write'
+
+		$eventDispatcher->addListener(
+			NodeWrittenEvent::class,
+			function (NodeWrittenEvent $event) use ($fileActions) {
+				$file = $event->getNode();
+				$fileActions->write([
+					'path' => mb_substr($file->getInternalPath(), 5),
+					'id' => $file->getId(),
+				]);
+			}
 		);
+
 		Util::connectHook(
 			Filesystem::CLASSNAME,
 			Filesystem::signal_post_update,
 			$fileActions,
 			'update'
 		);
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_read,
-			$fileActions,
-			'read'
+
+		$eventDispatcher->addListener(
+			BeforeNodeReadEvent::class,
+			function (BeforeNodeReadEvent $event) use ($fileActions) {
+				$file = $event->getNode();
+				$fileActions->read([
+					'path' => mb_substr($file->getInternalPath(), 5),
+					'id' => $file->getId(),
+				]);
+			}
 		);
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_delete,
-			$fileActions,
-			'delete'
+
+		$eventDispatcher->addListener(
+			NodeDeletedEvent::class,
+			function (NodeDeletedEvent $event) use ($fileActions) {
+				$file = $event->getNode();
+				$fileActions->delete([
+					'path' => mb_substr($file->getInternalPath(), 5),
+					'id' => $file->getId(),
+				]);
+			}
 		);
 	}
 

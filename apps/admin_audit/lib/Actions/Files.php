@@ -40,10 +40,10 @@ class Files extends Action {
 	 */
 	public function read(array $params): void {
 		$this->log(
-			'File accessed: "%s"',
+			'File accessed: "%s", id is: "%s"',
 			$params,
 			[
-				'path',
+				'path', 'id'
 			]
 		);
 	}
@@ -54,6 +54,7 @@ class Files extends Action {
 	 * @param array $params
 	 */
 	public function rename(array $params): void {
+		//TODO::not working as expected
 		$this->log(
 			'File renamed: "%s" to "%s"',
 			$params,
@@ -73,12 +74,11 @@ class Files extends Action {
 		if ($params['path'] === '/' || $params['path'] === '' || $params['path'] === null) {
 			return;
 		}
-
 		$this->log(
-			'File created: "%s"',
+			'File created: "%s", id is: "%s"',
 			$params,
 			[
-				'path',
+				'path', 'id'
 			]
 		);
 	}
@@ -90,11 +90,13 @@ class Files extends Action {
 	 */
 	public function copy(array $params): void {
 		$this->log(
-			'File copied: "%s" to "%s"',
+			'File copied: "%s" to "%s", id from "%s" to "%s"',
 			$params,
 			[
 				'oldpath',
 				'newpath',
+				'oldid',
+				'newid'
 			]
 		);
 	}
@@ -140,10 +142,10 @@ class Files extends Action {
 	 */
 	public function delete(array $params): void {
 		$this->log(
-			'File deleted: "%s"',
+			'File deleted: "%s", id is "%s"',
 			$params,
 			[
-				'path',
+				'path', 'id'
 			]
 		);
 	}
@@ -155,14 +157,15 @@ class Files extends Action {
 	 */
 	public function preview(array $params): void {
 		$this->log(
-			'Preview accessed: "%s" (width: "%s", height: "%s" crop: "%s", mode: "%s")',
+			'Preview accessed: "%s" (width: "%s", height: "%s" crop: "%s", mode: "%s", id: "%s")',
 			$params,
 			[
 				'path',
 				'width',
 				'height',
 				'crop',
-				'mode'
+				'mode',
+				'id'
 			]
 		);
 	}
