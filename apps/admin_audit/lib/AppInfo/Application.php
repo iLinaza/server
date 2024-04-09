@@ -59,6 +59,7 @@ use OCP\Authentication\TwoFactorAuth\TwoFactorProviderChallengePassed;
 use OCP\Console\ConsoleEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Events\Node\BeforeNodeReadEvent;
+use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\Events\Node\NodeCopiedEvent;
 use OCP\Files\Events\Node\NodeCreatedEvent;
 use OCP\Files\Events\Node\NodeDeletedEvent;
@@ -261,8 +262,8 @@ class Application extends App implements IBootstrap {
 		);
 
 		$eventDispatcher->addListener(
-			NodeWrittenEvent::class,
-			function (NodeWrittenEvent $event) use ($fileActions) {
+			BeforeNodeWrittenEvent::class,
+			function (BeforeNodeWrittenEvent $event) use ($fileActions) {
 				$file = $event->getNode();
 				$fileActions->write([
 					'path' => mb_substr($file->getInternalPath(), 5),
@@ -271,11 +272,15 @@ class Application extends App implements IBootstrap {
 			}
 		);
 
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_post_update,
-			$fileActions,
-			'update'
+		$eventDispatcher->addListener(
+			NodeWrittenEvent::class,
+			function (NodeWrittenEvent $event) use ($fileActions) {
+				$file = $event->getNode();
+				$fileActions->update([
+					'path' => mb_substr($file->getInternalPath(), 5),
+					'id' => $file->getId(),
+				]);
+			}
 		);
 
 		$eventDispatcher->addListener(

@@ -127,10 +127,10 @@ class Files extends Action {
 	 */
 	public function update(array $params): void {
 		$this->log(
-			'File updated: "%s"',
+			'File updated: "%s", id is: "%s"',
 			$params,
 			[
-				'path',
+				'path', 'id'
 			]
 		);
 	}
