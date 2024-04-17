@@ -95,7 +95,7 @@ class Files extends Action {
 		} catch (InvalidPathException|NotFoundException $e) {
 			return;
 		}
-		if ($params['path'] === '/' || $params['path'] === '' || $params['path'] === null) {
+		if ($params['path'] === '/' || $params['path'] === '') {
 			return;
 		}
 		$this->log(
@@ -142,7 +142,7 @@ class Files extends Action {
 		} catch (InvalidPathException|NotFoundException $e) {
 			return;
 		}
-		if ($params['path'] === '/' || $params['path'] === '' || $params['path'] === null) {
+		if ($params['path'] === '/' || $params['path'] === '') {
 			return;
 		}
 
