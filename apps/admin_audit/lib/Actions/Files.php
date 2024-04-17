@@ -112,10 +112,10 @@ class Files extends Action {
 		}
 
 		$this->log(
-			'File written to: "%s"',
+			'File written to: "%s", id is: "%s"',
 			$params,
 			[
-				'path',
+				'path', 'id'
 			]
 		);
 	}
