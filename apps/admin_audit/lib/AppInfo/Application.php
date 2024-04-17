@@ -201,16 +201,9 @@ class Application extends App implements IBootstrap {
 		$fileActions = new Files($logger);
 		$eventDispatcher->addListener(
 			BeforePreviewFetchedEvent::class,
-			function (BeforePreviewFetchedEvent $event) use ($fileActions) {
-				$file = $event->getNode();
-				$fileActions->preview([
-					'path' => mb_substr($file->getInternalPath(), 5),
-					'id' => $file->getId(),
-					'width' => $event->getWidth(),
-					'height' => $event->getHeight(),
-					'crop' => $event->isCrop(),
-					'mode' => $event->getMode()
-				]);
+			function (BeforePreviewFetchedEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->preview($event);
 			}
 		);
 
@@ -239,69 +232,49 @@ class Application extends App implements IBootstrap {
 
 		$eventDispatcher->addListener(
 			NodeCreatedEvent::class,
-			function (NodeCreatedEvent $event) use ($fileActions) {
-				$file = $event->getNode();
-				$fileActions->create([
-					'path' => mb_substr($file->getInternalPath(), 5),
-					'id' => $file->getId(),
-				]);
+			function (NodeCreatedEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->create($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeCopiedEvent::class,
-			function (NodeCopiedEvent $event) use ($fileActions) {
-				$source = $event->getSource();
-				$fileActions->copy([
-					'oldpath' => mb_substr($source->getInternalPath(), 5),
-					'newpath' => mb_substr($event->getTarget()->getInternalPath(), 5),
-					'oldid' => $source->getId(),
-					'newid' => $event->getTarget()->getId()
-				]);
+			function (NodeCopiedEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->copy($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			BeforeNodeWrittenEvent::class,
-			function (BeforeNodeWrittenEvent $event) use ($fileActions) {
-				$file = $event->getNode();
-				$fileActions->write([
-					'path' => mb_substr($file->getInternalPath(), 5),
-					'id' => $file->getId(),
-				]);
+			function (BeforeNodeWrittenEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->write($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeWrittenEvent::class,
-			function (NodeWrittenEvent $event) use ($fileActions) {
-				$file = $event->getNode();
-				$fileActions->update([
-					'path' => mb_substr($file->getInternalPath(), 5),
-					'id' => $file->getId(),
-				]);
+			function (NodeWrittenEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->update($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			BeforeNodeReadEvent::class,
-			function (BeforeNodeReadEvent $event) use ($fileActions) {
-				$file = $event->getNode();
-				$fileActions->read([
-					'path' => mb_substr($file->getInternalPath(), 5),
-					'id' => $file->getId(),
-				]);
+			function (BeforeNodeReadEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->read($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeDeletedEvent::class,
-			function (NodeDeletedEvent $event) use ($fileActions) {
-				$file = $event->getNode();
-				$fileActions->delete([
-					'path' => mb_substr($file->getInternalPath(), 5),
-					'id' => $file->getId(),
-				]);
+			function (NodeDeletedEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->delete($event);
 			}
 		);
 	}

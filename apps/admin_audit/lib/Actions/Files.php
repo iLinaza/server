@@ -27,6 +27,16 @@ declare(strict_types=1);
  */
 namespace OCA\AdminAudit\Actions;
 
+use OCP\Files\Events\Node\BeforeNodeReadEvent;
+use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
+use OCP\Files\Events\Node\NodeCopiedEvent;
+use OCP\Files\Events\Node\NodeCreatedEvent;
+use OCP\Files\Events\Node\NodeDeletedEvent;
+use OCP\Files\Events\Node\NodeWrittenEvent;
+use OCP\Files\InvalidPathException;
+use OCP\Files\NotFoundException;
+use OCP\Preview\BeforePreviewFetchedEvent;
+
 /**
  * Class Files logs the actions to files
  *
@@ -36,15 +46,21 @@ class Files extends Action {
 	/**
 	 * Logs file read actions
 	 *
-	 * @param array $params
+	 * @param BeforeNodeReadEvent $event
 	 */
-	public function read(array $params): void {
+	public function read(BeforeNodeReadEvent $event): void {
+		try {
+			$params = [
+				'id' => $event->getNode()->getId(),
+				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		$this->log(
-			'File accessed: "%s", id is: "%s"',
+			'File with id "%s" accessed: "%s"',
 			$params,
-			[
-				'path', 'id'
-			]
+			array_keys($params)
 		);
 	}
 
@@ -68,105 +84,140 @@ class Files extends Action {
 	/**
 	 * Logs creation of files
 	 *
-	 * @param array $params
+	 * @param NodeCreatedEvent $event
 	 */
-	public function create(array $params): void {
+	public function create(NodeCreatedEvent $event): void {
+		try {
+			$params = [
+				'id' => $event->getNode()->getId(),
+				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		if ($params['path'] === '/' || $params['path'] === '' || $params['path'] === null) {
 			return;
 		}
 		$this->log(
-			'File created: "%s", id is: "%s"',
+			'File with id "%s" created: "%s"',
 			$params,
-			[
-				'path', 'id'
-			]
+			array_keys($params)
 		);
 	}
 
 	/**
 	 * Logs copying of files
 	 *
-	 * @param array $params
+	 * @param NodeCopiedEvent $event
 	 */
-	public function copy(array $params): void {
+	public function copy(NodeCopiedEvent $event): void {
+		try {
+			$params = [
+				'oldid' => $event->getSource()->getId(),
+				'newid' => $event->getTarget()->getId(),
+				'oldpath' => mb_substr($event->getSource()->getInternalPath(), 5),
+				'newpath' => mb_substr($event->getTarget()->getInternalPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		$this->log(
-			'File copied: "%s" to "%s", id from "%s" to "%s"',
+			'File id copied from: "%s" to "%s", path from "%s" to "%s"',
 			$params,
-			[
-				'oldpath',
-				'newpath',
-				'oldid',
-				'newid'
-			]
+			array_keys($params)
 		);
 	}
 
 	/**
 	 * Logs writing of files
 	 *
-	 * @param array $params
+	 * @param BeforeNodeWrittenEvent $event
 	 */
-	public function write(array $params): void {
+	public function write(BeforeNodeWrittenEvent $event): void {
+		try {
+			$params = [
+				'id' => $event->getNode()->getId(),
+				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		if ($params['path'] === '/' || $params['path'] === '' || $params['path'] === null) {
 			return;
 		}
 
 		$this->log(
-			'File written to: "%s", id is: "%s"',
+			'File with id "%s" written to: "%s"',
 			$params,
-			[
-				'path', 'id'
-			]
+			array_keys($params)
 		);
 	}
 
 	/**
 	 * Logs update of files
 	 *
-	 * @param array $params
+	 * @param NodeWrittenEvent $event
 	 */
-	public function update(array $params): void {
+	public function update(NodeWrittenEvent $event): void {
+		try {
+			$params = [
+				'id' => $event->getNode()->getId(),
+				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		$this->log(
-			'File updated: "%s", id is: "%s"',
+			'File with id "%s" updated: "%s"',
 			$params,
-			[
-				'path', 'id'
-			]
+			array_keys($params)
 		);
 	}
 
 	/**
 	 * Logs deletions of files
 	 *
-	 * @param array $params
+	 * @param NodeDeletedEvent $event
 	 */
-	public function delete(array $params): void {
+	public function delete(NodeDeletedEvent $event): void {
+		try {
+			$params = [
+				'id' => $event->getNode()->getId(),
+				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		$this->log(
-			'File deleted: "%s", id is "%s"',
+			'File with id "%s" deleted: "%s"',
 			$params,
-			[
-				'path', 'id'
-			]
+			array_keys($params)
 		);
 	}
 
 	/**
 	 * Logs preview access to a file
 	 *
-	 * @param array $params
+	 * @param BeforePreviewFetchedEvent $event
 	 */
-	public function preview(array $params): void {
+	public function preview(BeforePreviewFetchedEvent $event): void {
+		try {
+			$file = $event->getNode();
+			$params = [
+				'id' => $file->getId(),
+				'width' => $event->getWidth(),
+				'height' => $event->getHeight(),
+				'crop' => $event->isCrop(),
+				'mode' => $event->getMode(),
+				'path' => mb_substr($file->getInternalPath(), 5)
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
 		$this->log(
-			'Preview accessed: "%s" (width: "%s", height: "%s" crop: "%s", mode: "%s", id: "%s")',
+			'Preview accessed: (id: "%s", width: "%s", height: "%s" crop: "%s", mode: "%s", path: "%s")',
 			$params,
-			[
-				'path',
-				'width',
-				'height',
-				'crop',
-				'mode',
-				'id'
-			]
+			array_keys($params)
 		);
 	}
 }
