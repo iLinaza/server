@@ -33,7 +33,6 @@ declare(strict_types=1);
  */
 namespace OCA\AdminAudit\AppInfo;
 
-use OC\Files\Filesystem;
 use OC\Group\Manager as GroupManager;
 use OC\User\Session as UserSession;
 use OCA\AdminAudit\Actions\AppManagement;
@@ -198,7 +197,6 @@ class Application extends App implements IBootstrap {
 
 	private function fileHooks(IAuditLogger $logger,
 		IEventDispatcher $eventDispatcher): void {
-		$fileActions = new Files($logger);
 		$eventDispatcher->addListener(
 			BeforePreviewFetchedEvent::class,
 			function (BeforePreviewFetchedEvent $event) use ($logger) {
@@ -207,27 +205,12 @@ class Application extends App implements IBootstrap {
 			}
 		);
 
-		/*
 		$eventDispatcher->addListener(
 			NodeRenamedEvent::class,
-			function (NodeRenamedEvent $event) use ($fileActions) {
-				$source = $event->getSource();
-				$target = $event->getTarget();
-				$fileActions->rename([
-					'oldpath' => mb_substr($source->getInternalPath(), 5),
-					'newpath' => mb_substr($target->getInternalPath(), 5),
-					'oldid' => $source->getId(),
-					'newid' => $target->getId()
-				]);
+			function (NodeRenamedEvent $event) use ($logger) {
+				$fileActions = new Files($logger);
+				$fileActions->rename($event);
 			}
-		);
-		*/
-
-		Util::connectHook(
-			Filesystem::CLASSNAME,
-			Filesystem::signal_post_rename,
-			$fileActions,
-			'rename'
 		);
 
 		$eventDispatcher->addListener(

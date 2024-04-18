@@ -32,6 +32,7 @@ use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\Events\Node\NodeCopiedEvent;
 use OCP\Files\Events\Node\NodeCreatedEvent;
 use OCP\Files\Events\Node\NodeDeletedEvent;
+use OCP\Files\Events\Node\NodeRenamedEvent;
 use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
@@ -67,17 +68,25 @@ class Files extends Action {
 	/**
 	 * Logs rename actions of files
 	 *
-	 * @param array $params
+	 * @param NodeRenamedEvent $event
 	 */
-	public function rename(array $params): void {
-		//TODO::not working as expected
+	public function rename(NodeRenamedEvent $event): void {
+		try {
+			$source = $event->getSource();
+			$target = $event->getTarget();
+			$params = [
+				'newid' => $target->getId(),
+				'oldpath' => mb_substr($source->getPath(), 5),
+				'newpath' => mb_substr($target->getPath(), 5),
+			];
+		} catch (InvalidPathException|NotFoundException $e) {
+			return;
+		}
+
 		$this->log(
-			'File renamed: "%s" to "%s"',
+			'File renamed with id "%s" from "%s" to "%s"',
 			$params,
-			[
-				'oldpath',
-				'newpath',
-			]
+			array_keys($params)
 		);
 	}
 
