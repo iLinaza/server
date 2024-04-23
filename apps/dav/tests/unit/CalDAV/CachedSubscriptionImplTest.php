@@ -31,9 +31,6 @@ use OCA\DAV\CalDAV\CachedSubscriptionImpl;
 use OCA\DAV\CalDAV\CalDavBackend;
 use Test\TestCase;
 
-/**
- * @group DB
- */
 class CachedSubscriptionImplTest extends TestCase {
 	private CachedSubscription $cachedSubscription;
 	private array $cachedSubscriptionInfo;
