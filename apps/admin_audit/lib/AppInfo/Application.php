@@ -197,66 +197,59 @@ class Application extends App implements IBootstrap {
 
 	private function fileHooks(IAuditLogger $logger,
 		IEventDispatcher $eventDispatcher): void {
+		$fileActions = new Files($logger);
 		$eventDispatcher->addListener(
 			BeforePreviewFetchedEvent::class,
-			function (BeforePreviewFetchedEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (BeforePreviewFetchedEvent $event) use ($fileActions) {
 				$fileActions->preview($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeRenamedEvent::class,
-			function (NodeRenamedEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (NodeRenamedEvent $event) use ($fileActions) {
 				$fileActions->rename($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeCreatedEvent::class,
-			function (NodeCreatedEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (NodeCreatedEvent $event) use ($fileActions) {
 				$fileActions->create($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeCopiedEvent::class,
-			function (NodeCopiedEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (NodeCopiedEvent $event) use ($fileActions) {
 				$fileActions->copy($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			BeforeNodeWrittenEvent::class,
-			function (BeforeNodeWrittenEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (BeforeNodeWrittenEvent $event) use ($fileActions) {
 				$fileActions->write($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeWrittenEvent::class,
-			function (NodeWrittenEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (NodeWrittenEvent $event) use ($fileActions) {
 				$fileActions->update($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			BeforeNodeReadEvent::class,
-			function (BeforeNodeReadEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (BeforeNodeReadEvent $event) use ($fileActions) {
 				$fileActions->read($event);
 			}
 		);
 
 		$eventDispatcher->addListener(
 			NodeDeletedEvent::class,
-			function (NodeDeletedEvent $event) use ($logger) {
-				$fileActions = new Files($logger);
+			function (NodeDeletedEvent $event) use ($fileActions) {
 				$fileActions->delete($event);
 			}
 		);

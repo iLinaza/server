@@ -56,6 +56,7 @@ class Files extends Action {
 				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file read: ".$e->getMessage());
 			return;
 		}
 		$this->log(
@@ -80,6 +81,7 @@ class Files extends Action {
 				'newpath' => mb_substr($target->getPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file rename: ".$e->getMessage());
 			return;
 		}
 
@@ -102,6 +104,7 @@ class Files extends Action {
 				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file create: ".$e->getMessage());
 			return;
 		}
 		if ($params['path'] === '/' || $params['path'] === '') {
@@ -128,6 +131,7 @@ class Files extends Action {
 				'newpath' => mb_substr($event->getTarget()->getInternalPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file copy: ".$e->getMessage());
 			return;
 		}
 		$this->log(
@@ -149,6 +153,7 @@ class Files extends Action {
 				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file write: ".$e->getMessage());
 			return;
 		}
 		if ($params['path'] === '/' || $params['path'] === '') {
@@ -174,6 +179,7 @@ class Files extends Action {
 				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file update: ".$e->getMessage());
 			return;
 		}
 		$this->log(
@@ -195,6 +201,7 @@ class Files extends Action {
 				'path' => mb_substr($event->getNode()->getInternalPath(), 5),
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file delete: ".$e->getMessage());
 			return;
 		}
 		$this->log(
@@ -221,6 +228,7 @@ class Files extends Action {
 				'path' => mb_substr($file->getInternalPath(), 5)
 			];
 		} catch (InvalidPathException|NotFoundException $e) {
+			$this->error("Exception thrown in file preview: ".$e->getMessage());
 			return;
 		}
 		$this->log(
